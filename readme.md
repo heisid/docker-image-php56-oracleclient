@@ -1,26 +1,43 @@
-# Development LARAVEL enviroment
+# Development LARAVEL 5 enviroment
 
-### latest
+Forked from https://github.com/jjuanrivvera99/docker-image-usc with downgraded PHP version to PHP 5.6 and additional xdebug.
 
-- Ubuntu 18.04 + Apache 2 + PHP 7.2 + Oracle Client 12.2 
+- Ubuntu 18.04 + Apache 2 + Oracle Client 12.2 + PHP 5.6 + xdebug 2.5.5 (Port 9003)
 - Apache document root '/var/www/public'
 
-# How to use this image
 
-### Command: 
 
-- docker run jjuanrivvera99/ubuntu18.04-apache2-php7.2-oracleclient12.2:tag -p 80:80 -p 443:443 -v /your_project_path:/var/www
+### Build
 
-### Running container with docker compose file
+```bash
+docker build -t laravel5-oracle .
+```
+
+
+
+### Docker Compose File
 
 ##### Example
+
+`docker-compose.yml`  in project root directory:
+
     version: '3'
+    
     services:
-        web:
-            container_name: container_name
-            image: jjuanrivvera99/ubuntu18.04-apache2-php7.2-oracleclient12.2:tagname
-            ports:
-                - 80:80
-                - 443:443
-            volumes:
-                - "./:/var/www/"
+      web:
+        container_name: laravel-oracle
+        image: laravel5-oracle:latest
+        ports:
+          - "80:80"
+        volumes:
+          - "./:/var/www
+
+Run `docker-compose up`
+
+Go to http://localhost
+
+Note to myself, don't forget to: 
+
+- `chmod 777 -R storage bootstrap public` (or it won't render to browser - Err 500)
+
+- in PhpStorm, set:  Debug port and path mapping (or it won't stop at breakpoints)
