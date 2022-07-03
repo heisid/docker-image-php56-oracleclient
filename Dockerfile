@@ -11,27 +11,6 @@ RUN apt-get update -yqq && apt-get install -yq --no-install-recommends \
     git \
     # Install apache
     apache2 \
-    # Install php 7.2
-    php7.2 \
-    libapache2-mod-php7.2 \
-    php7.2-cli \
-    php7.2-json \
-    php7.2-curl \
-    php7.2-fpm \
-    php7.2-dev \
-    php7.2-gd \
-    php7.2-ldap \
-    php7.2-mbstring \
-    php7.2-bcmath \
-    php7.2-mysql \
-    php7.2-soap \
-    php7.2-sqlite3 \
-    php7.2-xml \
-    php7.2-zip \
-    php7.2-intl \
-    libldap2-dev \
-    libaio1 \
-    libaio-dev \
     # Install tools
     openssl \
     nano \
@@ -39,13 +18,38 @@ RUN apt-get update -yqq && apt-get install -yq --no-install-recommends \
     iputils-ping \
     locales \
     rlwrap \
-    php-pear \
     make \
     unzip \
     zip \
     tar \
     ca-certificates \
-    && apt-get clean &&\
+    software-properties-common \
+    # Install PHP5.6
+    && add-apt-repository ppa:ondrej/php -y && \
+    apt-get install -yq --no-install-recommends \
+    php5.6 \
+    libapache2-mod-php5.6 \
+    php5.6-cli \
+    php5.6-json \
+    php5.6-curl \
+    php5.6-fpm \
+    php5.6-dev \
+    php5.6-gd \
+    php5.6-ldap \
+    php5.6-mbstring \
+    php5.6-bcmath \
+    php5.6-mysql \
+    php5.6-soap \
+    php5.6-sqlite3 \
+    php5.6-xml \
+    php5.6-zip \
+    php5.6-intl \
+    php-pear \
+    libldap2-dev \
+    libaio1 \
+    libaio-dev \
+    php5.6-xdebug \
+    && apt-get clean && \
     # Install Oracle Client
     cd /opt &&\
     mkdir oracle &&\
@@ -63,25 +67,26 @@ RUN apt-get update -yqq && apt-get install -yq --no-install-recommends \
     echo 'PATH=$PATH:/opt/oracle/instantclient_12_2' >> ~/.bashrc &&\
     echo "alias sqlplus='/usr/bin/rlwrap -m /opt/oracle/instantclient_12_2/sqlplus'" >> ~/.bashrc &&\
     cd /opt/oracle &&\
-    pecl download oci8 &&\
-    tar -xzvf oci8*.tgz &&\
-    cd oci8-2.2.0 &&\
+    pecl download oci8-2.0.12 &&\
+    tar -xzvf oci8-2.0.12.tgz &&\
+    cd oci8-2.0.12 &&\
     phpize &&\
     ./configure --with-oci8=instantclient,/opt/oracle/instantclient_12_2/ &&\
     make install &&\
-    echo 'instantclient,/opt/oracle/instantclient_12_2' | pecl install oci8 
+    echo 'instantclient,/opt/oracle/instantclient_12_2' | pecl install oci8-2.0.12
 
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Set locales
-RUN locale-gen en_US.UTF-8 en_GB.UTF-8 de_DE.UTF-8 es_ES.UTF-8 fr_FR.UTF-8 it_IT.UTF-8 km_KH sv_SE.UTF-8 fi_FI.UTF-8
+RUN locale-gen en_US.UTF-8
 
 # Configure PHP for My Site
-COPY my-site.ini /etc/php/7.2/mods-available/
+COPY my-site.ini /etc/php/5.6/mods-available/
+COPY xdebug.ini /etc/php/5.6/mods-available/xdebug.ini
 RUN phpenmod my-site
 # Configure apache for My Site
-RUN a2enmod rewrite expires
+RUN a2enmod rewrite expires proxy_fcgi setenvif
 RUN echo "ServerName localhost" | tee /etc/apache2/conf-available/servername.conf
 RUN a2enconf servername
 # Configure vhost for My Site
