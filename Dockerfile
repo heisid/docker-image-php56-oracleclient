@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -93,6 +93,11 @@ RUN a2enconf servername
 COPY my-site.conf /etc/apache2/sites-available/
 RUN a2dissite 000-default
 RUN a2ensite my-site.conf
+
+RUN ln -s /etc/apache2/mods-available/ssl.load  /etc/apache2/mods-enabled/ssl.load
+RUN mkdir -p /etc/apache2/ssl
+COPY localhost+2.pem /etc/apache2/ssl/
+COPY localhost+2-key.pem /etc/apache2/ssl/
 
 EXPOSE 80 443
 
